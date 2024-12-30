@@ -41,5 +41,6 @@ python dca.py -a -l 15
 ## Conversion to a Linux command
 1. Add a python shebang
 2. Rename `dca.py` to `dca`
-3. Add to path
-4. Test it: `dca --version`
+3. Add execution permission to `dca`
+4. Add to path
+5. Test it: `dca --version`
