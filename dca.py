@@ -5,7 +5,8 @@ import os
 import time
 import argparse
 
-load_dotenv()
+script_dir = os.path.dirname(os.path.realpath(__file__))
+load_dotenv(os.path.join(script_dir, '.env'))
 
 TOKEN=os.getenv('TOKEN')
 
