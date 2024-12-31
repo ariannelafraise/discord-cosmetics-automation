@@ -6,18 +6,10 @@ import sys
 import time
 import argparse
 
-VERSION = "1.21"
+VERSION = "1.22"
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 load_dotenv(os.path.join(script_dir, '.env'))
-
-try:
-    TOKEN=os.getenv('TOKEN')
-    if TOKEN is None:
-        raise ValueError('No token found in .env file.')
-except ValueError as e:
-    print(e, "Aborting.")
-    sys.exit(1)
 
 BASE_URL = "https://discord.com/api/v9"
 USER_URL = BASE_URL + "/users/@me"
@@ -134,6 +126,14 @@ if __name__ == "__main__":
     target.add_argument('-b', '--change-both', help="enable switching between profile effects AND avatar decorations", action="store_true")
 
     args = parser.parse_args()
+
+    try:
+        TOKEN=os.getenv('TOKEN')
+        if TOKEN is None:
+            raise ValueError('No token found in .env file.')
+    except ValueError as e:
+        print(e, "Aborting.")
+        sys.exit(1)
 
     if args.avatar_decorations:
         CHANGE_AVATAR_DECORATION = True
