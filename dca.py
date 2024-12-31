@@ -2,13 +2,20 @@ import requests
 import random
 from dotenv import load_dotenv
 import os
+import sys
 import time
 import argparse
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 load_dotenv(os.path.join(script_dir, '.env'))
 
-TOKEN=os.getenv('TOKEN')
+try:
+    TOKEN=os.getenv('TOKEN')
+    if TOKEN is None:
+        raise ValueError('No token found in .env file.')
+except ValueError as e:
+    print(e, "Aborting.")
+    sys.exit(1)
 
 BASE_URL = "https://discord.com/api/v9"
 USER_URL = BASE_URL + "/users/@me"
