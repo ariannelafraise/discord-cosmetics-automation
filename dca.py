@@ -6,6 +6,8 @@ import sys
 import time
 import argparse
 
+VERSION = "1.21"
+
 script_dir = os.path.dirname(os.path.realpath(__file__))
 load_dotenv(os.path.join(script_dir, '.env'))
 
@@ -122,7 +124,7 @@ def check_loop_arg(value):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--version', help="see the current version number", action='version', version="DCA v1.2")
+    parser.add_argument('--version', help="see the current version number", action='version', version=f"DCA v{VERSION}")
 
     parser.add_argument('-l', '--loop', type=check_loop_arg, help="enable loop mode for a given number of minutes")
 
