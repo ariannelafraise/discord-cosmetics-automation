@@ -19,15 +19,15 @@ TOKEN=YOUR_DISCORD_TOKEN
 ```
 
 ## Usage
->Loop mode (**-l**): Be careful of rate limits. This tool only allows as low as 15 seconds cooldown to not spam the Discord API.
+>Loop mode (**-l**): Be careful of rate limits. This tool only allows as low as a 10 minutes cooldown to prevent rate limits.
 
 Switching all cosmetics once (**-b**):
 ```sh
 python dca.py -b
 ```
-Switching all cosmetics every 30 seconds (**-l**):
+Switching all cosmetics every 10 minutes (**-l**):
 ```sh
-python dca.py -b -l 30
+python dca.py -b -l 10
 ```
 Switching profile effect only (**-p**):
 ```sh

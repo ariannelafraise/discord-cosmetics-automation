@@ -18,6 +18,9 @@ PROFILE_URL = USER_URL + "/profile"
 CHANGE_AVATAR_DECORATION = False
 CHANGE_PROFILE_EFFECT = False
 
+LAST_AVATAR_DECORATION_ID = 0
+LAST_PROFILE_EFFECT_ID = 0
+
 def fetch_collectibles():
     headers = {'authorization': TOKEN, 'accept': '*/*'}
     return requests.get(COLLECTIBLES_URL, headers=headers).json()
@@ -26,24 +29,29 @@ def select_random_cosmetics(collectibles):
     if len(collectibles) <= 0:
         raise ValueError("No collectibles.")
     
+    global LAST_AVATAR_DECORATION_ID, LAST_PROFILE_EFFECT_ID
     avatar_decoration = None
     profile_effect = None
     count = 0
 
     while profile_effect is None or avatar_decoration is None:
-        if count > len(collectibles):
+        if count > len(collectibles) * 5:
             break
 
         item = random.choice(collectibles)
         match item['items'][0]['type']:
             case 0:
-                avatar_decoration = {
-                    'avatar_decoration_id': item['items'][0]['id'],
-                    'avatar_decoration_sku_id': item['items'][0]['sku_id']
-                }
+                if item['items'][0]['id'] != LAST_AVATAR_DECORATION_ID and avatar_decoration is None:
+                    avatar_decoration = {
+                        'avatar_decoration_id': item['items'][0]['id'],
+                        'avatar_decoration_sku_id': item['items'][0]['sku_id']
+                    }
+                    LAST_AVATAR_DECORATION_ID = item['items'][0]['id']
 
             case 1:
-                profile_effect = {'profile_effect_id': item['items'][0]['id']}
+                if item['items'][0]['id'] != LAST_PROFILE_EFFECT_ID and profile_effect is None:
+                    profile_effect = {'profile_effect_id': item['items'][0]['id']}
+                    LAST_PROFILE_EFFECT_ID = item['items'][0]['id']
         
         count+=1
     
@@ -63,6 +71,7 @@ def apply_cosmetics(avatar_decoration, profile_effect):
 
     if avatar_decoration and CHANGE_AVATAR_DECORATION:
         requests.patch(USER_URL, headers=headers, json=avatar_decoration)
+        
     if profile_effect and CHANGE_PROFILE_EFFECT:
         requests.patch(PROFILE_URL, headers=headers, json=profile_effect)
 
@@ -90,22 +99,25 @@ def execute():
     except requests.exceptions.RequestException as e:
         print(e, "Aborting.")
         return
+    
+    print("avatar_decoration_id: " + LAST_AVATAR_DECORATION_ID)
+    print("profile_effect_id: " + LAST_PROFILE_EFFECT_ID)
 
 def check_loop_arg(value):
     try:
         checked_value = int(value)
     except ValueError:
         raise argparse.ArgumentTypeError(f"expected integer, got {type(value)}")
-    if checked_value < 15:
-        raise argparse.ArgumentTypeError(f"value must be greater than 15.")
+    if checked_value < 10:
+        raise argparse.ArgumentTypeError(f"value must be greater than 10")
     return checked_value
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--version', help="see the current version number", action='version', version="DCA v1.0")
+    parser.add_argument('--version', help="see the current version number", action='version', version="DCA v1.2")
 
-    parser.add_argument('-l', '--loop', type=check_loop_arg, help="enable loop mode for a given number of seconds")
+    parser.add_argument('-l', '--loop', type=check_loop_arg, help="enable loop mode for a given number of minutes")
 
     target = parser.add_mutually_exclusive_group(required=True)
     target.add_argument('-a', '--avatar-decorations', help="enable switching between avatar decorations", action="store_true")
@@ -130,8 +142,8 @@ if __name__ == "__main__":
         try:
             while True:
                 execute()
-                print(f"Waiting {args.loop} seconds")
-                time.sleep(args.loop)
+                print(f"Waiting {args.loop} minutes... {args.loop * 60}")
+                time.sleep(args.loop * 60)
         except KeyboardInterrupt:
             print("bye!")   
     else:
