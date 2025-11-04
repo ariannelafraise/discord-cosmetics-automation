@@ -1,3 +1,5 @@
+#!/bin/python
+
 import requests
 import random
 from dotenv import load_dotenv
@@ -40,6 +42,10 @@ def select_random_cosmetics(collectibles):
             break
 
         item = random.choice(collectibles)
+
+        if item['type'] not in [0, 1]:
+            break
+
         match item['items'][0]['type']:
             case 0:
                 if item['items'][0]['id'] != LAST_AVATAR_DECORATION_ID and avatar_decoration is None:
@@ -100,16 +106,13 @@ def execute():
     except requests.exceptions.RequestException as e:
         print(e, "Aborting.")
         return
-    
-    print("avatar_decoration_id: " + LAST_AVATAR_DECORATION_ID)
-    print("profile_effect_id: " + LAST_PROFILE_EFFECT_ID)
 
 def check_loop_arg(value):
     try:
         checked_value = int(value)
     except ValueError:
         raise argparse.ArgumentTypeError(f"expected integer, got {type(value)}")
-    if checked_value < 10:
+    if checked_value < 1:
         raise argparse.ArgumentTypeError(f"value must be greater than 10")
     return checked_value
 
